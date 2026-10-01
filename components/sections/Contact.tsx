@@ -138,7 +138,7 @@ export function Contact() {
           </div>
         </div>
       </div>
-      <WaveDivider from="var(--page-bg)" className="!mb-0 bg-cacau" flip />
+      <WaveDivider from="var(--areia)" className="!mb-0 bg-cacau" flip />
     </section>
   );
 }

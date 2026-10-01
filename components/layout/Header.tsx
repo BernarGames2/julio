@@ -63,7 +63,7 @@ export function Header() {
       <header
         data-hero-nav
         className={`fixed inset-x-0 top-0 z-50 transition-[background-color,color,box-shadow] duration-500 ${
-          scrolled ? "bg-linho/85 text-cacau shadow-[0_1px_0_rgb(42_26_21/0.08)] backdrop-blur-md" : "text-creme"
+          scrolled ? "bg-linho/95 text-cacau shadow-[0_1px_0_rgb(42_26_21/0.08)] md:bg-linho/85 md:backdrop-blur-md" : "text-creme"
         } ${open ? "!bg-transparent !text-creme !shadow-none" : ""}`}
       >
         <div className="container-x flex h-[68px] items-center justify-between gap-4 lg:h-[84px]">

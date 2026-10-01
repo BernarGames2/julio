@@ -51,8 +51,8 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-/** Liga o estado inicial das animações antes da 1ª pintura (evita flash) — com rede de segurança. */
-const bootScript = `(function(){try{var d=document.documentElement;d.classList.add('js-motion');var r=matchMedia('(prefers-reduced-motion: reduce)').matches;var s=null;try{s=sessionStorage.getItem('jb-intro')}catch(e){}if(!r&&s!=='1')d.classList.add('jb-intro');setTimeout(function(){if(!window.__motionReady){d.classList.remove('js-motion');d.classList.remove('jb-intro')}},4000)}catch(e){}})();`;
+/** Antes da 1ª pintura: decide se o preloader em CSS roda (1ª visita da sessão, sem reduced-motion). */
+const bootScript = `(function(){try{var d=document.documentElement;var r=matchMedia('(prefers-reduced-motion: reduce)').matches;var s=null;try{s=sessionStorage.getItem('jb-intro');sessionStorage.setItem('jb-intro','1')}catch(e){}if(!r&&s!=='1')d.classList.add('jb-intro')}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

@@ -6,7 +6,8 @@ import { loadGsap, prefersReducedMotion } from "@/lib/motion";
 /**
  * Motor de motion global:
  *  - Lenis (smooth scroll) sincronizado com o ScrollTrigger;
- *  - reveals globais ([data-reveal], [data-lines], [data-draw]);
+ *  - reveals globais ([data-reveal], [data-lines], [data-draw], [data-clip]) — só para o que
+ *    ainda está abaixo da tela quando o JS chega (o HTML nasce todo visível);
  *  - interpolação da cor de fundo da página entre seções ([data-bg]);
  *  - parallax das ondas ([data-wave]);
  *  - refresh do ScrollTrigger após fontes e imagens.
@@ -27,7 +28,7 @@ export function SmoothScroll() {
       if (!reduced) {
         const Lenis = (await import("lenis")).default;
         if (killed) return;
-        const l = new Lenis({ duration: 1.1, easing: (t: number) => 1 - Math.pow(1 - t, 4), smoothWheel: true });
+        const l = new Lenis({ lerp: 0.12, smoothWheel: true });
         l.on("scroll", ScrollTrigger.update);
         tick = (t: number) => l.raf(t * 1000);
         lenis = l;
@@ -52,65 +53,67 @@ export function SmoothScroll() {
       };
       document.addEventListener("click", onAnchor);
 
-      (window as unknown as { __motionReady?: boolean }).__motionReady = true;
+      // O HTML chega com tudo visível (sem JS, ou com JS atrasado em 4G, nada fica em branco).
+      // Quando o GSAP chega, só o que ainda está ABAIXO da tela é preparado para o reveal;
+      // o que já está na tela ou acima fica como está — sem "piscar".
+      const below = (el: Element) => el.getBoundingClientRect().top > innerHeight;
+
       const ctx = gsap.context(() => {
         // ---- reveals por bloco
         // Em saltos (âncora, fling, recarregar no meio da página) o batch pode trazer dezenas de
         // elementos de uma vez: os que já ficaram acima da tela aparecem na hora, e o stagger
         // dos visíveis é limitado a ~0,5s no total, para nada ficar "esperando a vez".
-        ScrollTrigger.batch("[data-reveal]", {
-          start: "top 88%",
-          once: true,
-          onEnter: (els) => {
-            const passed = els.filter((e) => e.getBoundingClientRect().bottom < 0);
-            const visible = els.filter((e) => !passed.includes(e));
-            if (passed.length) gsap.set(passed, { opacity: 1, y: 0, overwrite: true });
-            if (!visible.length) return;
-            gsap.to(visible, {
-              opacity: 1,
-              y: 0,
-              duration: reduced ? 0.4 : 1,
-              ease: "expo.out",
-              stagger: Math.min(0.1, 0.5 / visible.length),
-              delay: Number((visible[0] as HTMLElement).dataset.delay || 0),
-              overwrite: true,
-            });
-          },
-        });
-
-        // ---- títulos editoriais por linha
-        gsap.utils.toArray<HTMLElement>("[data-lines]").forEach((t) => {
-          if (t.closest("[data-hero]")) return;
-          const lines = t.querySelectorAll("[data-line]");
-          gsap.to(lines, {
-            y: 0,
-            duration: reduced ? 0.01 : 1.1,
-            stagger: 0.1,
-            ease: "expo.out",
-            scrollTrigger: { trigger: t, start: "top 85%", once: true },
+        const reveals = gsap.utils.toArray<HTMLElement>("[data-reveal]").filter(below);
+        reveals.forEach((el) => gsap.set(el, { opacity: 0, y: reduced || el.dataset.reveal === "fade" ? 0 : 40 }));
+        if (reveals.length)
+          ScrollTrigger.batch(reveals, {
+            start: "top 88%",
+            once: true,
+            onEnter: (els) => {
+              const passed = els.filter((e) => e.getBoundingClientRect().bottom < 0);
+              const visible = els.filter((e) => !passed.includes(e));
+              if (passed.length) gsap.set(passed, { opacity: 1, y: 0, overwrite: true });
+              if (!visible.length) return;
+              gsap.to(visible, {
+                opacity: 1,
+                y: 0,
+                duration: reduced ? 0.4 : 1,
+                ease: "expo.out",
+                stagger: Math.min(0.1, 0.5 / visible.length),
+                delay: Number((visible[0] as HTMLElement).dataset.delay || 0),
+                overwrite: true,
+              });
+            },
           });
-        });
 
-        // ---- fios SVG que se desenham
-        gsap.utils.toArray<SVGPathElement>("[data-draw]").forEach((p) => {
-          if (p.closest("[data-hero]")) return;
-          p.setAttribute("pathLength", "1");
-          gsap.to(p, {
-            strokeDashoffset: 0,
-            duration: reduced ? 0.01 : 2,
-            ease: "power2.inOut",
-            scrollTrigger: { trigger: p.closest("svg"), start: "top 85%", once: true },
+        if (!reduced) {
+          // ---- títulos editoriais por linha
+          gsap.utils.toArray<HTMLElement>("[data-lines]").filter(below).forEach((t) => {
+            gsap.fromTo(
+              t.querySelectorAll("[data-line]"),
+              { yPercent: 105 },
+              { yPercent: 0, duration: 1.1, stagger: 0.1, ease: "expo.out", scrollTrigger: { trigger: t, start: "top 85%", once: true } },
+            );
           });
-        });
 
-        // ---- imagens que revelam por clip-path (inset 100% → 0) com escala 1,2 → 1
-        gsap.utils.toArray<HTMLElement>("[data-clip]").forEach((el) => {
-          const inner = el.querySelector("[data-clip-inner]");
-          if (reduced) return;
-          const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 80%", once: true } });
-          tl.fromTo(el, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.out" });
-          if (inner) tl.fromTo(inner, { scale: 1.2 }, { scale: 1, duration: 1.6, ease: "expo.out" }, 0);
-        });
+          // ---- fios SVG que se desenham (os do hero são CSS)
+          gsap.utils.toArray<SVGPathElement>("[data-draw]").forEach((p) => {
+            if (p.closest("[data-hero]") || !below(p)) return;
+            gsap.fromTo(
+              p,
+              { strokeDasharray: 1, strokeDashoffset: 1 },
+              { strokeDashoffset: 0, duration: 2, ease: "power2.inOut", scrollTrigger: { trigger: p.closest("svg"), start: "top 85%", once: true } },
+            );
+          });
+
+          // ---- imagens que revelam por clip-path (inset 100% → 0) com escala 1,2 → 1
+          gsap.utils.toArray<HTMLElement>("[data-clip]").filter(below).forEach((el) => {
+            const inner = el.querySelector("[data-clip-inner]");
+            const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: "top 80%", once: true } });
+            tl.fromTo(el, { clipPath: "inset(100% 0% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 1.4, ease: "expo.out" });
+            if (inner) tl.fromTo(inner, { scale: 1.2 }, { scale: 1, duration: 1.6, ease: "expo.out" }, 0);
+          });
+        }
 
         // ---- parallax interno de imagem
         if (!reduced) {
@@ -120,7 +123,7 @@ export function SmoothScroll() {
         }
 
         // ---- contadores até os números REAIS
-        gsap.utils.toArray<HTMLElement>("[data-count]").forEach((el) => {
+        gsap.utils.toArray<HTMLElement>("[data-count]").filter(below).forEach((el) => {
           const end = Number(el.dataset.count);
           const dec = Number(el.dataset.decimals || 0);
           const o = { v: 0 };
@@ -137,10 +140,12 @@ export function SmoothScroll() {
         });
 
         // ---- cor de fundo interpolada entre seções
+        // Anima o background do <body> direto (não uma variável CSS na raiz): mudar uma custom
+        // property no :root obriga o navegador a recalcular o estilo da página inteira a cada quadro.
         const root = document.documentElement;
         gsap.utils.toArray<HTMLElement>("[data-bg]").forEach((s) => {
           const color = getComputedStyle(root).getPropertyValue(`--${s.dataset.bg}`).trim();
-          const set = () => gsap.to(root, { "--page-bg": color, duration: reduced ? 0.01 : 0.8, ease: "power2.out", overwrite: "auto" });
+          const set = () => gsap.to(document.body, { backgroundColor: color, duration: reduced ? 0.01 : 0.8, ease: "power2.out", overwrite: "auto" });
           ScrollTrigger.create({ trigger: s, start: "top 55%", end: "bottom 45%", onEnter: set, onEnterBack: set });
         });
 

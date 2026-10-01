@@ -10,6 +10,9 @@ import { FloatingCard } from "@/components/ui/FloatingCard";
 import { SwatchRing } from "@/components/ui/SwatchRing";
 import { HeroMotion } from "./HeroMotion";
 import Image from "next/image";
+import type { CSSProperties } from "react";
+
+const d = (n: number) => ({ "--d": n }) as CSSProperties;
 
 /**
  * HERO — capa de revista.
@@ -29,7 +32,8 @@ export function Hero() {
         data-hero-media
         className="absolute inset-x-0 top-0 h-[64svh] overflow-hidden [clip-path:ellipse(140%_100%_at_50%_0%)] md:inset-0 md:h-auto md:[clip-path:none]"
       >
-        <div data-hero-img className="absolute inset-0 will-change-transform">
+        <div data-hero-img className="absolute inset-0">
+          <div data-hero-zoom className="absolute inset-0">
           <Photo
             src={hero.image}
             alt={hero.imageAlt}
@@ -41,6 +45,7 @@ export function Hero() {
             tone={["#D99A62", "#7E2E14"]}
             cursorLabel=""
           />
+          </div>
           {hero.video && (
             <video
               data-hero-video
@@ -66,7 +71,7 @@ export function Hero() {
 
       {/* ---------- camada 1: headline gigante ---------- */}
       <div className="container-x relative z-10 flex flex-1 flex-col justify-end pb-5 pt-[max(22svh,6.5rem)] md:justify-end md:pb-10 md:pt-28">
-        <div data-hero-micro className="mb-5 md:mb-8 [@media(max-height:640px)_and_(max-width:767px)]:hidden">
+        <div data-hero-micro style={d(0)} className="mb-5 md:mb-8 [@media(max-height:640px)_and_(max-width:767px)]:hidden">
           <Badge tone="dark">
             <span className="h-1.5 w-1.5 rounded-full bg-cobre-claro" aria-hidden />
             {hero.badge}
@@ -80,7 +85,7 @@ export function Hero() {
               <SplitText text={hero.display[0]} announce={false} />
             </span>
             <span data-hero-line className="block whitespace-nowrap pl-[2vw] text-[15vw] leading-[0.95] md:leading-[0.86] md:pl-[min(7vw,6.5rem)] md:text-[clamp(5rem,13vw,12.5rem)]">
-              <SplitText text={hero.display[1]} announce={false} />
+              <SplitText text={hero.display[1]} announce={false} startIndex={hero.display[0].length} />
             </span>
           </span>
           <span
@@ -108,7 +113,7 @@ export function Hero() {
             <strong className="font-medium text-creme">alisamentos</strong> e reestruturação capilar no Centro de Uberlândia.
             Toda cor começa por uma avaliação do seu fio — com calma, sem promessa milagrosa.
           </p>
-          <div data-hero-micro className="mt-5 flex flex-wrap gap-3 md:mt-7">
+          <div data-hero-micro style={d(1)} className="mt-5 flex flex-wrap gap-3 md:mt-7">
             <Button
               href={whatsappUrl("geral")}
               external
@@ -128,6 +133,7 @@ export function Hero() {
             target="_blank"
             rel="noopener noreferrer"
             data-hero-micro
+            style={d(2)}
             className="mt-7 inline-flex items-center gap-3 text-sm text-ash"
           >
             <span className="flex -space-x-2" aria-hidden>
@@ -143,10 +149,10 @@ export function Hero() {
         </div>
 
         <div className="relative hidden h-full min-h-[14rem] lg:block">
-          <div data-hero-card className="absolute right-[2%] top-[38%]">
+          <div data-hero-card style={d(0)} className="absolute right-[2%] top-[38%]">
             <FloatingCard n="01">{hero.floatingCards[0]}</FloatingCard>
           </div>
-          <div data-hero-card className="absolute bottom-2 right-[30%]">
+          <div data-hero-card style={d(1)} className="absolute bottom-2 right-[30%]">
             <FloatingCard n="02">{hero.floatingCards[1]}</FloatingCard>
           </div>
         </div>
@@ -154,7 +160,7 @@ export function Hero() {
 
       {/* pistas de rolagem */}
       <div className="container-x relative z-30 flex items-center justify-between border-t border-creme/15 py-4 sm:pr-24 lg:pr-28">
-        <a href="#especialidade" data-hero-micro className="micro flex items-center gap-3 !text-[0.62rem] text-ash">
+        <a href="#especialidade" data-hero-micro style={d(3)} className="micro flex items-center gap-3 !text-[0.62rem] text-ash">
           <span className="scroll-pulse grid h-9 w-9 place-items-center rounded-full ring-1 ring-mel/50">
             <svg viewBox="0 0 24 24" className="h-4 w-4 text-mel" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden>
               <path d="M12 4v15M6 13l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
@@ -162,7 +168,7 @@ export function Hero() {
           </span>
           Role <span className="text-mel">01 / 07</span>
         </a>
-        <span data-hero-micro className="hidden items-center gap-3 md:flex" aria-hidden>
+        <span data-hero-micro style={d(4)} className="hidden items-center gap-3 md:flex" aria-hidden>
           <SwatchRing n="07" size={34} textClass="text-creme" />
           <span className="micro !text-[0.62rem] text-ash">Sete tons · uma avaliação</span>
         </span>
@@ -171,6 +177,7 @@ export function Hero() {
           target="_blank"
           rel="noopener noreferrer"
           data-hero-micro
+          style={d(5)}
           className="micro link-underline !text-[0.62rem] text-mel"
         >
           Agende sua avaliação →

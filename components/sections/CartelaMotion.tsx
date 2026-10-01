@@ -50,7 +50,7 @@ export function CartelaMotion() {
               gsap.set(rings, { rotate: p * 360, transformOrigin: "50% 50%" });
               const seg = p * (colors.length - 1);
               const i = Math.min(Math.floor(seg), colors.length - 2);
-              root.style.setProperty("--page-bg", gsap.utils.interpolate(colors[i], colors[i + 1], seg - i));
+              document.body.style.backgroundColor = gsap.utils.interpolate(colors[i], colors[i + 1], seg - i);
             },
           },
         });

@@ -1,3 +1,5 @@
+import type { CSSProperties } from "react";
+
 /**
  * Fios/mechas desenhados em SVG — motivo gráfico da marca.
  * Os paths têm `data-draw` e são "desenhados" (stroke-dashoffset) pelo motor de motion.
@@ -34,6 +36,8 @@ export function Strands({
           key={i}
           d={d}
           data-draw
+          pathLength={1}
+          style={{ "--d": i } as CSSProperties}
           stroke={color}
           strokeWidth={width}
           strokeLinecap="round"

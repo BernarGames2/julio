@@ -48,15 +48,21 @@ Com alguma das duas preenchida, aparece o banner de cookies (LGPD), com **Aceita
 Eventos (sem dados pessoais): `whatsapp_click` (com `section`: header, hero, especialidade, cartela, sobre, contato, fab), `phone_click`, `directions_click`, `instagram_click`.
 
 ## Motion
-- Coreografia em `components/ui/SmoothScroll.tsx` (motor global: Lenis + ScrollTrigger, reveals, cor de fundo interpolada, ondas, clip-path, contadores) e ilhas por seção (`HeroMotion`, `ManifestoMotion`, `CartelaMotion`), além de `Marquee`, `BeforeAfter`, `Cursor`, `Preloader` e `ScrollProgress`.
-- GSAP e Lenis são carregados por *dynamic import*. Só animam `transform`, `opacity`, `clip-path` e `filter`.
-- **Sem JS o conteúdo fica todo visível.** O estado inicial "escondido" só é aplicado quando o JS confirma que vai rodar, com uma rede de segurança de 4s.
+- **Abertura em CSS puro** (`styles/globals.css`, seção "ABERTURA"): preloader (anel, contagem 00→100 e cortina) e entrada do hero (letras, itálico, zoom, fios, cards). Roda no compositor desde a 1ª pintura e não espera o JS baixar, o que importa em 4G.
+- **GSAP + Lenis** (dynamic import) para o que depende de rolagem: `components/ui/SmoothScroll.tsx` (reveals, cor de fundo entre seções, ondas, clip-path, contadores) e as ilhas `HeroMotion` (parallax e vídeo), `ManifestoMotion` e `CartelaMotion`, além de `Marquee`, `BeforeAfter`, `Cursor` e `ScrollProgress`.
+- **O conteúdo nasce visível.** Quando o GSAP chega, ele prepara para o reveal só o que ainda está abaixo da tela. Sem JS, ou com JS lento, nada fica em branco.
+- **Regras de desempenho** (não quebre ao editar):
+  - Anime só `transform`, `opacity`, `clip-path` e `filter`.
+  - **Nunca anime uma variável CSS no `:root`.** Isso recalcula o estilo da página inteira a cada quadro. A cor de fundo anima o `background-color` do `<body>` direto.
+  - Sem `will-change` permanente.
+  - Sem `backdrop-filter` nem `mix-blend-mode` em áreas grandes no celular.
 - `prefers-reduced-motion`: sem Lenis, preloader, parallax, cursor, marquee, split por letra nem pin horizontal. Ficam só fades curtos e o comparador continua funcional.
-- O Framer Motion foi avaliado e **retirado**: as microinterações (magnético, preenchimento, ondulação) são feitas com CSS e transform puros, o que economizou cerca de 30 KB de JS e melhorou o TBT no mobile.
+- O Framer Motion foi avaliado e **retirado**: as microinterações (magnético, preenchimento, ondulação) são feitas com CSS e transform puros, o que economizou cerca de 30 KB de JS.
 
 ## Verificação feita
 - Screenshots (Playwright) em 375, 390, 768, 1440 e 1920, mais reduced-motion: sem scroll horizontal e sem erros de console.
 - Emulação de aparelhos com toque (iPhone SE 320px, iPhone 13, Pixel 7, Galaxy S9+ e iPad Pro 11 na horizontal): o CTA do hero aparece na primeira tela, o botão de WhatsApp é tocável e abre o `wa.me` com a mensagem, e o reveal funciona ao pular por âncora ou recarregar no meio da página. Na emulação não existe barra de endereço real nem Safari/WebKit, então **confira num celular de verdade**.
+- Desempenho medido com CPU 4x mais lenta e 4G simulado (celular médio). Rolagem no celular: travadas acima de 100ms caíram de ~25 para 1–4 por percurso, e o p95 de quadro foi de 117ms para 33ms. Desktop com a Cartela fixada: de 19fps para 44fps. Botão "Agendar avaliação" do hero visível em 2,5s, contra 4,2s antes.
 - Lighthouse mobile (servidor local, sem fotos reais): Performance 92–95, Acessibilidade 100, Boas práticas 100, SEO 100. CLS 0, LCP de 2,2 a 2,5s (o TTFB local de cerca de 450ms pesa; na Vercel a tendência é ficar menor). **Rode o Lighthouse de novo depois de colocar as fotos reais**, porque o `hero.jpg` passa a ser o elemento de LCP. Mantenha-o abaixo de 350 KB.
 - Lint, typecheck e build passando.
 

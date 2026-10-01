@@ -78,7 +78,7 @@ export function Specialty() {
           <div className="pointer-events-none absolute -left-12 bottom-10 hidden lg:block" data-reveal="fade">
             <SwatchRing n="01" size={120} tone="var(--mel)" textClass="text-creme" />
           </div>
-          <p className="micro absolute bottom-6 right-6 rounded-full bg-cacau/75 px-4 py-2 !text-[0.6rem] text-mel backdrop-blur">
+          <p className="micro absolute bottom-6 right-6 rounded-full bg-cacau/85 px-4 py-2 !text-[0.6rem] text-mel">
             BlondHair · Loiríssima
           </p>
         </div>
