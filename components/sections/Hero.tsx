@@ -65,8 +65,8 @@ export function Hero() {
       <Strands className="pointer-events-none absolute -left-10 top-[30%] z-[1] h-[40vh] w-[120vw] opacity-70 md:top-[52%]" />
 
       {/* ---------- camada 1: headline gigante ---------- */}
-      <div className="container-x relative z-10 flex flex-1 flex-col justify-end pb-6 pt-[34svh] md:justify-end md:pb-10 md:pt-28">
-        <div data-hero-micro className="mb-5 md:mb-8">
+      <div className="container-x relative z-10 flex flex-1 flex-col justify-end pb-5 pt-[max(22svh,6.5rem)] md:justify-end md:pb-10 md:pt-28">
+        <div data-hero-micro className="mb-5 md:mb-8 [@media(max-height:640px)_and_(max-width:767px)]:hidden">
           <Badge tone="dark">
             <span className="h-1.5 w-1.5 rounded-full bg-cobre-claro" aria-hidden />
             {hero.badge}
@@ -108,7 +108,7 @@ export function Hero() {
             <strong className="font-medium text-creme">alisamentos</strong> e reestruturação capilar no Centro de Uberlândia.
             Toda cor começa por uma avaliação do seu fio — com calma, sem promessa milagrosa.
           </p>
-          <div data-hero-micro className="mt-7 flex flex-wrap gap-3">
+          <div data-hero-micro className="mt-5 flex flex-wrap gap-3 md:mt-7">
             <Button
               href={whatsappUrl("geral")}
               external

@@ -97,11 +97,11 @@ export function Header() {
               external
               event={{ name: "whatsapp_click", section: "header" }}
               variant={light ? "mel" : "primary"}
-              className="!min-h-[44px] !px-4 !py-2.5 !text-[0.82rem] sm:!px-5"
+              className="!min-h-[44px] !px-4 !py-2.5 !text-[0.82rem] max-[359px]:!gap-0 max-[359px]:!px-3 sm:!px-5"
               icon={<WhatsIcon className="h-4 w-4" />}
             >
               <span className="hidden sm:inline">Agendar avaliação</span>
-              <span className="sm:hidden">Agendar</span>
+              <span className="sm:hidden max-[359px]:sr-only">Agendar</span>
             </Button>
             <button
               ref={menuBtn}

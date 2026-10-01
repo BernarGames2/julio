@@ -55,19 +55,27 @@ export function SmoothScroll() {
       (window as unknown as { __motionReady?: boolean }).__motionReady = true;
       const ctx = gsap.context(() => {
         // ---- reveals por bloco
+        // Em saltos (âncora, fling, recarregar no meio da página) o batch pode trazer dezenas de
+        // elementos de uma vez: os que já ficaram acima da tela aparecem na hora, e o stagger
+        // dos visíveis é limitado a ~0,5s no total, para nada ficar "esperando a vez".
         ScrollTrigger.batch("[data-reveal]", {
           start: "top 88%",
           once: true,
-          onEnter: (els) =>
-            gsap.to(els, {
+          onEnter: (els) => {
+            const passed = els.filter((e) => e.getBoundingClientRect().bottom < 0);
+            const visible = els.filter((e) => !passed.includes(e));
+            if (passed.length) gsap.set(passed, { opacity: 1, y: 0, overwrite: true });
+            if (!visible.length) return;
+            gsap.to(visible, {
               opacity: 1,
               y: 0,
               duration: reduced ? 0.4 : 1,
               ease: "expo.out",
-              stagger: 0.1,
-              delay: Number((els[0] as HTMLElement).dataset.delay || 0),
+              stagger: Math.min(0.1, 0.5 / visible.length),
+              delay: Number((visible[0] as HTMLElement).dataset.delay || 0),
               overwrite: true,
-            }),
+            });
+          },
         });
 
         // ---- títulos editoriais por linha

@@ -32,7 +32,7 @@ Adicione em `testimonials` (`data/site.ts`) apenas depoimentos **reais, com nome
 - `hero.video = { webm: "/images/hero/hero.webm", mp4: "/images/hero/hero.mp4" }` → vídeo mudo em loop, com o `hero.jpg` de pôster. Ele é desligado automaticamente em *reduced motion* e em economia de dados.
 
 ## Deploy na Vercel
-1. Importe o repositório na Vercel (o framework Next.js é detectado sozinho).
+1. Em vercel.com → **Add New… → Project**, importe `bernargames2/julio` (o framework Next.js é detectado sozinho; não precisa mudar build command nem output). Hoje a branch padrão do repositório é `claude/trusting-bohr-hna1xu`, então o primeiro deploy já sai dela; cada push novo gera outro deploy, e outras branches viram *Preview*.
 2. Defina `NEXT_PUBLIC_SITE_URL` com o domínio final (canonical, sitemap e Open Graph usam esse valor).
 3. Deploy. Por usar `output: "export"`, o mesmo `/out` também funciona em qualquer hospedagem estática.
 
@@ -56,6 +56,7 @@ Eventos (sem dados pessoais): `whatsapp_click` (com `section`: header, hero, esp
 
 ## Verificação feita
 - Screenshots (Playwright) em 375, 390, 768, 1440 e 1920, mais reduced-motion: sem scroll horizontal e sem erros de console.
+- Emulação de aparelhos com toque (iPhone SE 320px, iPhone 13, Pixel 7, Galaxy S9+ e iPad Pro 11 na horizontal): o CTA do hero aparece na primeira tela, o botão de WhatsApp é tocável e abre o `wa.me` com a mensagem, e o reveal funciona ao pular por âncora ou recarregar no meio da página. Na emulação não existe barra de endereço real nem Safari/WebKit, então **confira num celular de verdade**.
 - Lighthouse mobile (servidor local, sem fotos reais): Performance 92–95, Acessibilidade 100, Boas práticas 100, SEO 100. CLS 0, LCP de 2,2 a 2,5s (o TTFB local de cerca de 450ms pesa; na Vercel a tendência é ficar menor). **Rode o Lighthouse de novo depois de colocar as fotos reais**, porque o `hero.jpg` passa a ser o elemento de LCP. Mantenha-o abaixo de 350 KB.
 - Lint, typecheck e build passando.
 
