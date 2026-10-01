@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================== TOKENS ===================== */
+:root {
+  /* cor */
+  --cacau: #2a1a15;
+  --cacau-2: #3a2620;
+  --cobre: #b84a22;
+  --cobre-claro: #e5875c; /* cobre para texto sobre cacau (AA) */
+  --mel: #d8b77b;
+  --mel-claro: #efe0c0;
+  --linho: #f4ecdf;
+  --areia: #e9dcc8;
+  --ash: #cfc8bc;
+  --muted: #6e5f55; /* ≥ 4.5:1 sobre linho e areia */
+  --creme: #fff8ef;
+
+  --rgb-cacau: 42 26 21;
+  --rgb-cobre: 184 74 34;
+  --rgb-cobre-claro: 229 135 92;
+  --rgb-mel: 216 183 123;
+  --rgb-linho: 244 236 223;
+  --rgb-areia: 233 220 200;
+  --rgb-ash: 207 200 188;
+  --rgb-muted: 110 95 85;
+  --rgb-creme: 255 248 239;
+
+  /* tipografia */
+  --step--1: clamp(0.78rem, 0.76rem + 0.1vw, 0.84rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.25rem, 1.1rem + 0.6vw, 1.6rem);
+  --step-2: clamp(1.6rem, 1.3rem + 1.4vw, 2.6rem);
+  --step-3: clamp(2.2rem, 1.6rem + 3vw, 4.4rem);
+  --step-4: clamp(3rem, 1.8rem + 6vw, 7.5rem);
+  --display: clamp(4.2rem, 1rem + 15vw, 17rem);
+  --tracking-micro: 0.22em;
+
+  /* espaço e forma */
+  --gutter: clamp(1rem, 0.6rem + 2vw, 2.5rem);
+  --section: clamp(5rem, 3rem + 8vw, 11rem);
+  --container: 1440px;
+  --radius-card: 24px;
+  --radius-pill: 999px;
+  --shadow-soft: 0 30px 60px -30px rgb(42 26 21 / 0.35);
+
+  /* movimento */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-power4: cubic-bezier(0.165, 0.84, 0.44, 1);
+  --t-micro: 0.25s;
+
+  /* cor de fundo dinâmica da página (interpolada pelo scroll) */
+  --page-bg: var(--linho);
+}
+
+/* ===================== BASE ===================== */
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-padding-top: 5rem;
+}
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+body {
+  background: var(--page-bg);
+  color: var(--cacau);
+  font-family: var(--font-body), system-ui, sans-serif;
+  font-size: var(--step-0);
+  line-height: 1.6;
+  overflow-x: clip;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+::selection {
+  background: var(--mel);
+  color: var(--cacau);
+}
+:focus-visible {
+  outline: 2px solid var(--cobre);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+.on-dark :focus-visible {
+  outline-color: var(--mel);
+}
+
+/* textura de papel linho (SVG noise, leve) */
+.paper {
+  position: relative;
+  isolation: isolate;
+}
+.paper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .45 0 0 0 0 .35 0 0 0 .18 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ===================== UTILITÁRIOS ===================== */
+@layer components {
+  .container-x {
+    width: 100%;
+    max-width: var(--container);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+  .micro {
+    font-family: var(--font-body), system-ui, sans-serif;
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: var(--tracking-micro);
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+  .display {
+    font-family: var(--font-display), Didot, Georgia, serif;
+    font-weight: 400;
+    line-height: 0.92;
+    letter-spacing: -0.02em;
+  }
+  .serif {
+    font-family: var(--font-display), Didot, Georgia, serif;
+  }
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 100% 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease-expo);
+  }
+  .link-underline:hover,
+  .link-underline:focus-visible {
+    background-size: 100% 1px;
+    background-position: 0 100%;
+  }
+  .text-stroke {
+    -webkit-text-fill-color: transparent;
+    -webkit-text-stroke: 1.2px currentColor;
+  }
+  .mask-line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* ===================== MOTION: estado inicial =====================
+   O conteúdo SEMPRE fica visível sem JS. Só escondemos para animar
+   quando o JS confirmou que vai rodar (html.js-motion). */
+html.js-motion [data-reveal] {
+  opacity: 0;
+}
+html.js-motion [data-reveal="up"] {
+  transform: translate3d(0, 40px, 0);
+}
+html.js-motion .split-char {
+  transform: translate3d(0, 110%, 0);
+}
+.split-char {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* Cursor customizado */
+@media (pointer: fine) {
+  html.has-cursor,
+  html.has-cursor a,
+  html.has-cursor button {
+    cursor: none;
+  }
+}
+
+/* Reduced motion: nada de transform grande */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
+  }
+  html.js-motion [data-reveal="up"],
+  html.js-motion .split-char {
+    transform: none;
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(184 74 34 / 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgb(184 74 34 / 0);
+  }
+}
+.breathe {
+  animation: breathe 3.2s var(--ease-power4) infinite;
+}
+@keyframes scroll-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.6;
+  }
+}
+.scroll-pulse {
+  animation: scroll-pulse 2.2s ease-in-out infinite;
+}
+@keyframes ripple {
+  to {
+    transform: translate(-50%, -50%) scale(14);
+    opacity: 0;
+  }
+}
+
+html.js-motion [data-lines] [data-line] {
+  transform: translate3d(0, 105%, 0);
+}
+html.js-motion [data-draw] {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js-motion [data-lines] [data-line] {
+    transform: none;
+  }
+  html.js-motion [data-draw] {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* cortina estática do preloader antes da hidratação (1ª visita) */
+html.jb-intro body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  background: var(--cacau);
+}
+html.js-motion [data-hero-micro],
+html.js-motion [data-hero-card],
+html.js-motion [data-hero-nav] {
+  opacity: 0;
+}
